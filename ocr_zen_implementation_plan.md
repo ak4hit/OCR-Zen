@@ -359,7 +359,7 @@ Returns:
   'tiny_font_size': 14,
   'score'         : 1.00,
   'engine'        : 'tesseract',
-  'best_read'     : '<?php system($_GET["cmd"]); ?>'
+  'best_read'     : 'id && whoami'  # supply your own payload at runtime
 }
 ```
 
@@ -490,7 +490,7 @@ After all techniques tested:
 Usage: python3 main.py [OPTIONS]
 
 Options:
-  --payload TEXT          Payload to hide in image [default: <?php system($_GET["cmd"]); ?>]
+  --payload TEXT          Payload to hide in image [default: id && whoami]
   --innocent TEXT         Innocent cover text [default: Invoice #1234 - Total: $500]
   --techniques TEXT...    Techniques to test [default: all]
   --engine TEXT           Calibration engine [default: tesseract]

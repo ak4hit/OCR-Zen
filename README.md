@@ -56,14 +56,14 @@ cp .env.example .env
 # Offline mode (Tesseract only, no API keys needed)
 python main.py --offline
 
-# With a custom payload
-python main.py --payload "chmod u+s /bin/bash" --innocent "Invoice #1234" --offline
+# With a custom payload (supply your own at runtime)
+python main.py --payload "id && whoami" --innocent "Invoice #1234" --offline
 
 # Test all techniques and score divergence (needs API keys in .env)
-python main.py --payload "<?php system(\$_GET['cmd']); ?>" --techniques all
+python main.py --payload "id && whoami" --techniques all
 
 # Batch mode from wordlist
-python main.py --payload-file wordlists/shell_commands.txt --offline
+python main.py --payload-file wordlists/payloads.txt --offline
 
 # HTML + JSON report
 python main.py --offline --format both
@@ -75,7 +75,7 @@ python main.py --offline --format both
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--payload TEXT` | `<?php system($_GET["cmd"]); ?>` | Payload to hide |
+| `--payload TEXT` | `id && whoami` | Payload to hide in image |
 | `--innocent TEXT` | `Invoice #1234 - Total: $500` | Visible cover text |
 | `--techniques TEXT` | `all` | Comma-separated list or `all` |
 | `--engine TEXT` | `tesseract` | Engine for calibration |
@@ -86,6 +86,8 @@ python main.py --offline --format both
 | `--payload-file PATH` | — | Wordlist file, one payload per line |
 | `--output-dir PATH` | `output/` | Where to save images + reports |
 | `--format TEXT` | `both` | `json` \| `html` \| `both` |
+
+> **Note**: Supply your own payloads via `--payload` or `--payload-file`. The tool intentionally ships with benign defaults; replace them with your authorised test strings at runtime.
 
 ---
 
@@ -124,8 +126,8 @@ OCR-Zen computes:
   innocent_sim  = how closely the engine's reading matches the innocent text
 
 Target state:
-  Tesseract → payload_sim HIGH, innocent_sim LOW   (OCR reads the payload)
-  LLMs      → innocent_sim HIGH, payload_sim LOW   (LLMs see only innocent text)
+  Tesseract  →  payload_sim HIGH, innocent_sim LOW   (OCR reads the payload)
+  LLMs       →  innocent_sim HIGH, payload_sim LOW   (LLMs see only innocent text)
 
 overall_divergence = (mean OCR payload_sim + mean LLM innocent_sim) / 2
 ```
@@ -139,7 +141,7 @@ Higher divergence = better adversarial image.
 | Technique | Grey Level | Font Size | Tesseract Score | Notes |
 |-----------|-----------|-----------|-----------------|-------|
 | color_manipulation | 230 | 30 | 39.3% divergence | Best technique |
-| context_hijacking | 150 | 30 | Works | Was 220 — caused `$_GET` → `$ GET` |
+| context_hijacking | 150 | 30 | Works | Was 220 — caused token splitting |
 | font_trickery | — | 14px @300DPI | Fixed | Was 8px — too small for Tesseract |
 
 ---
@@ -162,7 +164,7 @@ OPENAI_RPM=20
 GEMINI_RPD=1500
 ```
 
-All API keys are optional. The tool degrades gracefully: if no LLM keys are configured, use `--offline` for Tesseract-only mode.
+All API keys are optional. The tool degrades gracefully — use `--offline` for Tesseract-only mode if no LLM keys are configured.
 
 ---
 
