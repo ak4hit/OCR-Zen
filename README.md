@@ -1,3 +1,5 @@
+> **Last Updated**: 2026-07-16 · Phase 1 Complete
+
 # OCR-Zen 🔮
 
 > **The opposite of a CAPTCHA.**
