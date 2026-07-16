@@ -2,6 +2,9 @@
 
 # OCR-Zen 🔮
 
+![OCR-Zen Banner](assets/ocr_zen_banner.png)
+
+
 > **The opposite of a CAPTCHA.**
 >
 > Generates images that humans read as innocent text — but OCR engines and document-processing pipelines read as shell commands or payloads.

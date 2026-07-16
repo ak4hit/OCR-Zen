@@ -1,0 +1,36 @@
+# OCR-Zen Payload Wordlist
+# ─────────────────────────────────────────────────────────────────────────────
+# Add your own authorised test payloads here — one per line.
+# Lines starting with # are treated as comments and are skipped.
+#
+# The payloads below are benign recon commands used as stand-ins during
+# development and CI testing. Replace with your authorised test strings
+# for real assessments.
+# ─────────────────────────────────────────────────────────────────────────────
+
+# System recon (safe defaults — replace with your payloads)
+id && whoami
+hostname && uname -a
+whoami && id && pwd
+cat /etc/os-release
+uname -r
+echo $PATH
+env | grep HOME
+
+# Network recon (safe)
+hostname -I
+ip addr show
+netstat -tlnp
+
+# File recon (safe)
+ls -la /tmp
+ls -la /home
+find /tmp -type f
+
+# Process recon (safe)
+ps aux | head -20
+ps -ef | grep root
+
+# Credential recon patterns (non-functional stubs for OCR bypass testing)
+cat /etc/h0stname
+ls /r00t/.ssh
