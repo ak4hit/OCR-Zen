@@ -18,6 +18,14 @@ AWS_ACCESS_KEY_ID: str = os.getenv("AWS_ACCESS_KEY_ID", "")
 AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
 AWS_REGION: str = os.getenv("AWS_REGION", "us-east-1")
 
+# ── Tesseract binary path ─────────────────────────────────────────────────────
+# Windows default install location. Override in .env if installed elsewhere.
+TESSERACT_CMD: str = os.getenv(
+    "TESSERACT_CMD",
+    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+)
+
+
 # ── Multi-key round-robin support ─────────────────────────────────────────────
 def _collect_keys(prefix: str) -> list[str]:
     """Collect GOOGLE_API_KEY_1, _2, _3 ... style multi-keys."""
