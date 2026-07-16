@@ -184,9 +184,9 @@ All API keys are optional. The tool degrades gracefully — use `--offline` for 
 | Phase | Status | Description |
 |-------|--------|-------------|
 | 1 | ✅ Complete | Scaffolding, deps, config, stubs |
-| 2 | 🔲 Next | Image generation techniques |
-| 3 | 🔲 Pending | LLM engine wrappers |
-| 4 | 🔲 Pending | Calibration engine |
+| 2 | ✅ Complete | Image generation techniques |
+| 3 | ✅ Complete | LLM engine wrappers |
+| 4 | 🔲 Next | Calibration engine |
 | 5 | 🔲 Pending | Divergence scorer |
 | 6 | 🔲 Pending | CLI, rate limiting, robustness |
 | 7 | 🔲 Pending | Reports (JSON + HTML) |
