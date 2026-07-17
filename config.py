@@ -4,6 +4,7 @@ Reads from .env file and exposes typed config values throughout the project.
 """
 
 import os
+import sys
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -19,11 +20,18 @@ AWS_SECRET_ACCESS_KEY: str = os.getenv("AWS_SECRET_ACCESS_KEY", "")
 AWS_REGION: str = os.getenv("AWS_REGION", "us-east-1")
 
 # ── Tesseract binary path ─────────────────────────────────────────────────────
-# Windows default install location. Override in .env if installed elsewhere.
-TESSERACT_CMD: str = os.getenv(
-    "TESSERACT_CMD",
-    r"C:\Program Files\Tesseract-OCR\tesseract.exe",
-)
+# On Windows: default to the standard install path.
+# On Linux/macOS: leave empty so pytesseract finds `tesseract` on PATH.
+# Override at any time via TESSERACT_CMD= in .env.
+def _default_tesseract_cmd() -> str:
+    env_val = os.getenv("TESSERACT_CMD", "")
+    if env_val:
+        return env_val
+    if sys.platform == "win32":
+        return r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    return ""  # Linux/macOS: pytesseract discovers system tesseract via PATH
+
+TESSERACT_CMD: str = _default_tesseract_cmd()
 
 
 # ── Multi-key round-robin support ─────────────────────────────────────────────

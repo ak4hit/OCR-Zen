@@ -1,6 +1,6 @@
 """
 engines/tesseract.py — Local Tesseract OCR wrapper for OCR-Zen.
-Phase 2/3 implementation — Tesseract confirmed at C:\Program Files\Tesseract-OCR\.
+Phase 2/3 implementation. On Windows, set TESSERACT_CMD in .env if needed.
 """
 
 from __future__ import annotations

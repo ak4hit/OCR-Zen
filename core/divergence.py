@@ -201,8 +201,10 @@ class DivergenceScorer:
             eng  = engines.get(name)
             role = self._get_role(name, eng, engine_roles) if eng else "llm"
 
-            # Skip placeholder / offline skips from scoring
-            is_error = raw_text.startswith("[") and "skipped" in raw_text.lower()
+            # Skip ALL error / placeholder strings from similarity scoring.
+            # Any reading starting with '[' is an error or offline-skip marker.
+            # (e.g. "[tesseract not installed]", "[claude: offline mode — skipped]")
+            is_error = raw_text.startswith("[")
 
             if is_error:
                 p_sim = 0.0
