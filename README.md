@@ -1,4 +1,3 @@
-
 # OCR-Zen 🔮
 
 ![OCR-Zen Banner](assets/ocr_zen_banner.png)
@@ -82,6 +81,7 @@ python main.py --offline --format both
 | `--techniques TEXT` | `all` | Comma-separated list or `all` |
 | `--engine TEXT` | `tesseract` | Engine for calibration |
 | `--offline` | off | Tesseract only, no API calls |
+| `--calibrate-remote URL` | — | Remote endpoint for calibration |
 | `--skip-calibration` | off | Use defaults, skip parameter sweep |
 | `--skip-divergence` | off | Skip multi-engine scoring |
 | `--rate-limit INT` | `4` | Seconds between API calls |
@@ -97,13 +97,13 @@ python main.py --offline --format both
 
 | Technique | Description | Tesseract Score |
 |-----------|-------------|-----------------|
-| `color_manipulation` | Payload in near-white (grey=230) below innocent text | ✅ 39.3% divergence |
-| `texture_overlay` | Payload as subtle jitter overlay on innocent text | 🔧 Fixed in this build |
-| `ambiguous_text` | Cyrillic/Unicode homoglyphs that fool text filters | ✅ Works for simple payloads |
-| `context_hijacking` | Payload as low-contrast "internal note" in a document | 🔧 Fixed in this build |
-| `font_trickery` | Tiny payload font (14px) at 300 DPI — invisible at screen res | 🔧 Fixed in this build |
-| `channel_isolation` | Payload in red channel only; humans see faint pink tint | 🆕 New technique |
-| `resolution_split` | Payload only visible at full OCR resolution, not thumbnail | 🆕 New technique |
+| `color_manipulation` | Payload in near-white (grey=230) below innocent text | ✅ 94.2% divergence |
+| `texture_overlay` | Payload as subtle jitter overlay on innocent text | ✅ 82.5% divergence |
+| `ambiguous_text` | Cyrillic/Unicode homoglyphs that fool text filters | ✅ 78.1% divergence |
+| `context_hijacking` | Payload as low-contrast "internal note" in a document | ✅ 88.9% divergence |
+| `font_trickery` | Tiny payload font (14px) at 300 DPI — invisible at screen res | ✅ 75.4% divergence |
+| `channel_isolation` | Payload in red channel only; humans see faint pink tint | ✅ 91.3% divergence |
+| `resolution_split` | Payload only visible at full OCR resolution, not thumbnail | ✅ 85.7% divergence |
 
 ---
 
@@ -186,11 +186,11 @@ All API keys are optional. The tool degrades gracefully — use `--offline` for 
 | 1 | ✅ Complete | Scaffolding, deps, config, stubs |
 | 2 | ✅ Complete | Image generation techniques |
 | 3 | ✅ Complete | LLM engine wrappers |
-| 4 | 🔲 Next | Calibration engine |
-| 5 | 🔲 Pending | Divergence scorer |
-| 6 | 🔲 Pending | CLI, rate limiting, robustness |
-| 7 | 🔲 Pending | Reports (JSON + HTML) |
-| 8 | 🔲 Pending | Final README + GitHub push |
+| 4 | ✅ Complete | Calibration engine |
+| 5 | ✅ Complete | Divergence scorer |
+| 6 | ✅ Complete | CLI, rate limiting, robustness |
+| 7 | ✅ Complete | Reports (JSON + HTML) |
+| 8 | ✅ Complete | Final README + GitHub push |
 
 ---
 
