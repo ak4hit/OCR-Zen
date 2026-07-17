@@ -2,6 +2,9 @@
 
 ![OCR-Zen Banner](assets/ocr_zen_banner.png)
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-cyan.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/python-3.10%2B-blue.svg)](https://www.python.org/)
+[![Security Research](https://img.shields.io/badge/purpose-security%20research-red.svg)]()
 
 > **The opposite of a CAPTCHA.**
 >
@@ -45,7 +48,7 @@ brew install tesseract
 
 # Windows: https://github.com/UB-Mannheim/tesseract/wiki
 
-# 4. Copy .env and add your API keys (all optional — works offline with Tesseract)
+# 4. Copy .env and add your API keys (all optional -- works offline with Tesseract)
 cp .env.example .env
 ```
 
@@ -64,7 +67,7 @@ python main.py --payload "id && whoami" --innocent "Invoice #1234" --offline
 python main.py --payload "id && whoami" --techniques all
 
 # Batch mode from wordlist
-python main.py --payload-file wordlists/payloads.txt --offline
+python main.py --payload-file wordlists/shell_commands.txt --offline
 
 # HTML + JSON report
 python main.py --offline --format both
@@ -81,11 +84,11 @@ python main.py --offline --format both
 | `--techniques TEXT` | `all` | Comma-separated list or `all` |
 | `--engine TEXT` | `tesseract` | Engine for calibration |
 | `--offline` | off | Tesseract only, no API calls |
-| `--calibrate-remote URL` | — | Remote endpoint for calibration |
+| `--calibrate-remote URL` | -- | Calibrate against a live target endpoint |
 | `--skip-calibration` | off | Use defaults, skip parameter sweep |
 | `--skip-divergence` | off | Skip multi-engine scoring |
 | `--rate-limit INT` | `4` | Seconds between API calls |
-| `--payload-file PATH` | — | Wordlist file, one payload per line |
+| `--payload-file PATH` | -- | Wordlist file, one payload per line |
 | `--output-dir PATH` | `output/` | Where to save images + reports |
 | `--format TEXT` | `both` | `json` \| `html` \| `both` |
 
@@ -95,23 +98,23 @@ python main.py --offline --format both
 
 ## Techniques
 
-| Technique | Description | Tesseract Score |
-|-----------|-------------|-----------------|
-| `color_manipulation` | Payload in near-white (grey=230) below innocent text | ✅ 94.2% divergence |
-| `texture_overlay` | Payload as subtle jitter overlay on innocent text | ✅ 82.5% divergence |
-| `ambiguous_text` | Cyrillic/Unicode homoglyphs that fool text filters | ✅ 78.1% divergence |
-| `context_hijacking` | Payload as low-contrast "internal note" in a document | ✅ 88.9% divergence |
-| `font_trickery` | Tiny payload font (14px) at 300 DPI — invisible at screen res | ✅ 75.4% divergence |
-| `channel_isolation` | Payload in red channel only; humans see faint pink tint | ✅ 91.3% divergence |
-| `resolution_split` | Payload only visible at full OCR resolution, not thumbnail | ✅ 85.7% divergence |
+| Technique | Description | Notes |
+|-----------|-------------|-------|
+| `color_manipulation` | Payload in near-white (grey=230) below innocent text | Strongest -- 92% divergence in tests |
+| `texture_overlay` | Payload as subtle jitter overlay on innocent text | Fixed: jitter +/-3px, 2 offsets |
+| `ambiguous_text` | Cyrillic/Unicode homoglyphs that fool text filters | Works for simple payloads |
+| `context_hijacking` | Payload as low-contrast "internal note" in a document | Fixed: grey 220->150, underscore preserved |
+| `font_trickery` | Tiny payload font at 300 DPI -- invisible at screen res | Fixed: 8px->14px @300DPI |
+| `channel_isolation` | Payload in red channel only; humans see faint pink tint | New -- requires red-channel pre-processing |
+| `resolution_split` | Payload only visible at full OCR resolution, not thumbnail | New -- Nyquist threshold rendering |
 
 ---
 
 ## How Calibration Works
 
-Before generating the real payload image, OCR-Zen sweeps `grey_level × font_size` combinations against the target engine and locks in the parameters that score highest for payload readability.
+Before generating the real payload image, OCR-Zen sweeps `grey_level x font_size` combinations against the target engine and locks in the parameters that score highest for payload readability.
 
-- **45 test images** per calibration run (9 grey levels × 5 font sizes)
+- **45 test images** per calibration run (9 grey levels x 5 font sizes)
 - **Pre-seeded results** for Tesseract (returns instantly, no sweep needed)
 - **Cache**: Results saved to `output/calibration/{engine}_{hash}.json`, valid 7 days
 - **Remote mode**: `--calibrate-remote URL` tests against the actual target endpoint
@@ -128,8 +131,8 @@ OCR-Zen computes:
   innocent_sim  = how closely the engine's reading matches the innocent text
 
 Target state:
-  Tesseract  →  payload_sim HIGH, innocent_sim LOW   (OCR reads the payload)
-  LLMs       →  innocent_sim HIGH, payload_sim LOW   (LLMs see only innocent text)
+  Tesseract  ->  payload_sim HIGH, innocent_sim LOW   (OCR reads the payload)
+  LLMs       ->  innocent_sim HIGH, payload_sim LOW   (LLMs see only innocent text)
 
 overall_divergence = (mean OCR payload_sim + mean LLM innocent_sim) / 2
 ```
@@ -142,9 +145,10 @@ Higher divergence = better adversarial image.
 
 | Technique | Grey Level | Font Size | Tesseract Score | Notes |
 |-----------|-----------|-----------|-----------------|-------|
-| color_manipulation | 230 | 30 | 39.3% divergence | Best technique |
-| context_hijacking | 150 | 30 | Works | Was 220 — caused token splitting |
-| font_trickery | — | 14px @300DPI | Fixed | Was 8px — too small for Tesseract |
+| color_manipulation | 230 | 30 | 1.00 payload_sim | Best technique |
+| context_hijacking | 150 | 30 | Works | Was 220 -- caused token splitting |
+| font_trickery | -- | 14px @300DPI | Fixed | Was 8px -- too small for Tesseract |
+| any technique | -- | 48px | 0.81-0.84 | Line-wrapping artefact -- avoid |
 
 ---
 
@@ -166,16 +170,30 @@ OPENAI_RPM=20
 GEMINI_RPD=1500
 ```
 
-All API keys are optional. The tool degrades gracefully — use `--offline` for Tesseract-only mode if no LLM keys are configured.
+All API keys are optional. The tool degrades gracefully -- use `--offline` for Tesseract-only mode if no LLM keys are configured.
+
+### Multi-Key Rotation
+
+For sustained testing without hitting per-key quotas, add multiple keys per engine:
+
+```env
+GOOGLE_API_KEY_1=key1
+GOOGLE_API_KEY_2=key2
+GOOGLE_API_KEY_3=key3
+```
+
+OCR-Zen automatically rotates to the next key when a 429 is received.
 
 ---
 
 ## Adding Your Own Technique
 
-1. Add a method `_technique_yourname(self, payload, innocent, cal)` to `core/generator.py`
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full step-by-step guide. In brief:
+
+1. Add `_technique_yourname(self, payload, innocent, cal)` to `core/generator.py`
 2. Add `"yourname"` to the `TECHNIQUES` list in the same class
-3. The method should return a `PIL.Image.Image` object
-4. OCR-Zen will automatically include it in calibration + divergence scoring
+3. The method must return a `PIL.Image.Image` object
+4. OCR-Zen will automatically include it in calibration and divergence scoring
 
 ---
 
@@ -183,14 +201,26 @@ All API keys are optional. The tool degrades gracefully — use `--offline` for 
 
 | Phase | Status | Description |
 |-------|--------|-------------|
-| 1 | ✅ Complete | Scaffolding, deps, config, stubs |
-| 2 | ✅ Complete | Image generation techniques |
-| 3 | ✅ Complete | LLM engine wrappers |
-| 4 | ✅ Complete | Calibration engine |
-| 5 | ✅ Complete | Divergence scorer |
-| 6 | ✅ Complete | CLI, rate limiting, robustness |
-| 7 | ✅ Complete | Reports (JSON + HTML) |
-| 8 | ✅ Complete | Final README + GitHub push |
+| 1 | Complete | Scaffolding, deps, config |
+| 2 | Complete | 7 image generation techniques |
+| 3 | Complete | LLM engine wrappers (Tesseract, Claude, Gemini, OpenAI, Textract) |
+| 4 | Complete | Calibration engine with cache + remote mode |
+| 5 | Complete | Multi-engine divergence scorer |
+| 6 | Complete | CLI, rate limiting, quota tracker, batch mode |
+| 7 | Complete | JSON + HTML reports, Rich terminal summary |
+| 8 | Complete | README + GitHub push |
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add a new technique, engine wrapper, or bug fix.
+
+---
+
+## License
+
+MIT -- see [LICENSE](LICENSE). Use for authorised security research only.
 
 ---
 
@@ -200,4 +230,4 @@ OCR-Zen is a research tool for **authorised red team assessments and security re
 
 ---
 
-*OCR-Zen · by ak4hit*
+*OCR-Zen - by ak4hit*
