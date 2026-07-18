@@ -157,7 +157,7 @@ class Calibrator:
             "result":    result.to_dict(),
         }
         path.write_text(json.dumps(data, indent=2), encoding="utf-8")
-        print(f"[Calibrator] Result cached → {path.name}")
+        print(f"[Calibrator] Result cached -> {path.name}")
 
     # ── 4.1  Test image renderer ──────────────────────────────────────────────
 

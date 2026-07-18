@@ -68,12 +68,19 @@ class TesseractEngine:
                 img = img.convert("L").point(lambda x: 0 if x < 200 else 255, "1")
 
             elif preprocess == "red_channel":
-                # channel_isolation technique: extract green channel (payload
-                # is in red — (255, red_shade, red_shade) — green channel has
-                # contrast between text and background), then invert so payload
-                # appears dark on light for Tesseract.
+                # channel_isolation technique: payload color is (255, red_shade, red_shade)
+                # where red_shade < 255 (e.g. 210).  Background is pure white (255, 255, 255).
+                #
+                # Green channel contrast:
+                #   background pixel G = 255
+                #   payload text    G = red_shade (e.g. 210)  → contrast = 45
+                #
+                # Strategy: extract green channel → apply binary threshold at 240.
+                # Pixels with G < 240 (the payload text) → become black (0).
+                # Pixels with G >= 240 (the background)  → become white (255).
+                # Result: dark text on white background — Tesseract's preferred input.
                 _, g, _ = img.split()
-                img = ImageOps.invert(g)
+                img = g.point(lambda p: 0 if p < 240 else 255, "1")
 
             # ── OCR ────────────────────────────────────────────────────────────
             cfg = f"--psm {psm} --oem 3"
